@@ -4,10 +4,12 @@ const jwt = require('jsonwebtoken');
 const usersService = require('../../users/services/users');
 const HttpError = require('../../common/models/HttpError');
 const { JWT_SECRET } = require('../../common/constants/env');
+const emailsService = require('../../common/services/emailService');
 
 class AuthService {
     constructor(usersService) {
         this.usersService = usersService;
+        this.emailsService = emailsService;
       }
     
     async register(payload){
@@ -82,6 +84,18 @@ class AuthService {
           refreshToken,
         };
       }
+
+      async sendResetLinkToEmail(email) {
+        return await this.emailsService.sendResetPasswordLink(email);
+      }
+    
+      async resetPassword({ password, token }) {
+        const { sub } = jwt.verify(token, JWT_SECRET);
+        const passwordHash = await bcrypt.hash(password, 10);
+    
+        await this.usersService.updateUserById(sub, { password: passwordHash });
+      }
+    
 
 }
 

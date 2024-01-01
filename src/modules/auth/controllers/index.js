@@ -47,6 +47,27 @@ class AuthController {
     });
   };
 
+  getResetToken = async (req, res) => {
+    const { email } = req.body;
+    await authService.sendResetLinkToEmail(email);
+
+    res.json({
+      status: 200,
+      message: `Reset link is sent to ${email}`,
+    });
+  };
+
+  resetPassword = async (req, res) => {
+    const { token, password } = req.body;
+    await authService.resetPassword({ token, password });
+
+    res.json({
+      status: 200,
+      message: `Password for is reset`,
+    });
+  };
+
+
 }
 const authController = new AuthController(authService);
 
